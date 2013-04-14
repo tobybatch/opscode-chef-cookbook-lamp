@@ -1,0 +1,2 @@
+opscode-chef-cookbook-lamp
+==========================
