@@ -23,6 +23,7 @@ package "php5-mcrypt"   # for composer
 
 project = node[:project]
 repo_directory = "/var/www/#{project}"
+
 credentials = data_bag_item('credentials', node.chef_environment)
 
 if node.chef_environment == "development" then
@@ -33,7 +34,7 @@ if node.chef_environment == "development" then
   
   include_recipe "mysql"
 
-  node.override["mysql"]["server_root_password"] = credentials['database']['name']
+  node.override["mysql"]["server_root_password"] = credentials['database']['pass']
 
   include_recipe "mysql::server"
   include_recipe "mysql::client"
@@ -72,10 +73,10 @@ end
 
 liquibase_command = "java -jar #{repo_directory}/liquibase/liquibase.jar "\
           "--changeLogFile=#{repo_directory}/changes.sql "\
-          "--url=jdbc:mysql://#{credentials['database']['hostname']}/#{credentials['database']['database']} "\
+          "--url=jdbc:mysql://#{credentials['database']['host']}/#{credentials['database']['name']} "\
           "--classpath=/usr/share/java/mysql-connector-java.jar "\
-          "--username=#{credentials['database']['username']} "\
-          "--password=#{credentials['database']['password']} "\
+          "--username=#{credentials['database']['user']} "\
+          "--password=#{credentials['database']['pass']} "\
           "update"
 
 execute liquibase_command do
