@@ -36,11 +36,29 @@ if node.chef_environment == "development" then
 
   include_recipe "mysql::server"
   include_recipe "mysql::client"
+
+  file "#{repo_directory}/schema.sql" do
+    not_if do
+      File.exists?("#{repo_directory}/schema.sql")
+    end
+  end
   
   execute "mysql -u root -e \"create database #{project};\" && mysql #{project} -u root < schema.sql" do
     cwd repo_directory
     not_if "if [ -z \"`mysql -u root -e \\\"show databases like '#{project}'\\\"`\" ]; then exit 1; fi"
   end 
+
+  directory "#{repo_directory}/tests/lib/" do
+    action :create
+    recursive true
+  end
+
+  file "#{repo_directory}/tests/lib/.gitkeep" do
+    not_if do
+      File.exists?("#{repo_directory}/tests/lib/.gitkeep")
+    end
+end
+  
   
   remote_file "#{repo_directory}/tests/lib/jasmine.js" do
     source "https://s3.amazonaws.com/daftlabs-assets/jasmine/jasmine.js"
@@ -69,6 +87,13 @@ ark "liquibase" do
   strip_components 0
 end
 
+file "#{repo_directory}/changes.sql" do
+  content "--liquibase formatted sql"
+  not_if do
+    File.exists?("#{repo_directory}/changes.sql")
+  end
+end
+  
 liquibase_command = "java -jar #{repo_directory}/liquibase/liquibase.jar "\
           "--changeLogFile=#{repo_directory}/changes.sql "\
           "--url=jdbc:mysql://#{credentials['database']['host']}/#{credentials['database']['name']} "\
