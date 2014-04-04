@@ -32,6 +32,8 @@ if node.chef_environment == "development" then
   node.default["mysql"]["tunable"]["wait_timeout"] = "3600"
   node.default['mysql']['tunable']['max_allowed_packet']   = "256M"
   
+  include_recipe "mysql"
+
   node.override["mysql"]["server_root_password"] = credentials['database']['pass']
 
   include_recipe "mysql::server"
