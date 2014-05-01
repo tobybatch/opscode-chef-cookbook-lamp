@@ -1,4 +1,3 @@
-include_recipe "git"
 include_recipe "apt"
 include_recipe "ark"
 include_recipe "curl"
@@ -58,6 +57,12 @@ if node.include_testing then
   file "#{repo_directory}/tests/lib/.gitkeep" do
     not_if do
       File.exists?("#{repo_directory}/tests/lib/.gitkeep")
+    end
+  end
+  
+  file "#{repo_directory}/tests/data.sql" do
+    not_if do
+      File.exists?("#{repo_directory}/tests/data.sql")
     end
   end
 
