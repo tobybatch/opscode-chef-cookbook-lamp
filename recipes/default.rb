@@ -1,4 +1,3 @@
-include_recipe "git"
 include_recipe "apt"
 include_recipe "ark"
 include_recipe "curl"
@@ -26,7 +25,7 @@ repo_directory = "/var/www/#{project}"
 
 credentials = data_bag_item('credentials', node.chef_environment)
 
-if node.chef_environment == "development" then
+if node.local_database then
   node.default["mysql"]["tunable"]["connect_timeout"] = "3600"
   node.default["mysql"]["tunable"]["net_read_timeout"] = "3600"
   node.default["mysql"]["tunable"]["wait_timeout"] = "3600"
@@ -52,14 +51,25 @@ if node.chef_environment == "development" then
     action :create
     recursive true
   end
-
+end
+  
+if node.include_testing then
   file "#{repo_directory}/tests/lib/.gitkeep" do
     not_if do
       File.exists?("#{repo_directory}/tests/lib/.gitkeep")
     end
-end
+  end
   
-  
+  file "#{repo_directory}/tests/data.sql" do
+    not_if do
+      File.exists?("#{repo_directory}/tests/data.sql")
+    end
+  end
+
+  execute "mysql #{project} -u root < data.sql" do
+    cwd "#{repo_directory}/tests"
+  end
+
   remote_file "#{repo_directory}/tests/lib/jasmine.js" do
     source "https://s3.amazonaws.com/daftlabs-assets/jasmine/jasmine.js"
     action :create

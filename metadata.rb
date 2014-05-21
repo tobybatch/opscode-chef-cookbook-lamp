@@ -4,9 +4,8 @@ maintainer_email 'support@daftlabs.com'
 license          'All rights reserved'
 description      'Installs/Configures a LAMP server.'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '0.13.0'
+version          '0.14.0'
 
-depends 'git'
 depends 'apt'
 depends 'ark'
 depends 'curl'
