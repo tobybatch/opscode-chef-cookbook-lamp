@@ -23,15 +23,13 @@ package "php5-mcrypt"   # for composer
 project = node[:project]
 repo_directory = "/var/www/#{project}"
 
-credentials = data_bag_item('credentials', node.chef_environment)
-
 if node.local_database then
   node.default["mysql"]["tunable"]["connect_timeout"] = "3600"
   node.default["mysql"]["tunable"]["net_read_timeout"] = "3600"
   node.default["mysql"]["tunable"]["wait_timeout"] = "3600"
   node.default['mysql']['tunable']['max_allowed_packet']   = "256M"
   
-  node.override["mysql"]["server_root_password"] = credentials['database']['pass']
+  node.override["mysql"]["server_root_password"] = node.database.pass
 
   include_recipe "mysql::server"
   include_recipe "mysql::client"
@@ -106,10 +104,10 @@ end
   
 liquibase_command = "java -jar #{repo_directory}/liquibase/liquibase.jar "\
           "--changeLogFile=#{repo_directory}/changes.sql "\
-          "--url=jdbc:mysql://#{credentials['database']['host']}/#{credentials['database']['name']} "\
+          "--url=jdbc:mysql://#{node.database.host}/#{node.database.name} "\
           "--classpath=/usr/share/java/mysql-connector-java.jar "\
-          "--username=#{credentials['database']['user']} "\
-          "--password=#{credentials['database']['pass']} "\
+          "--username=#{node.database.user} "\
+          "--password=#{node.database.pass} "\
           "update"
 
 execute liquibase_command do
