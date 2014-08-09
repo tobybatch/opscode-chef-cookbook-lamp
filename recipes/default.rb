@@ -114,7 +114,7 @@ execute liquibase_command do
   cwd "#{repo_directory}/liquibase"
 end
 
-template "/etc/apache2/sites-available/#{project}" do
+template "/etc/apache2/sites-available/#{project}.conf" do
   source "vhost.erb"
   mode 0644
   variables(
