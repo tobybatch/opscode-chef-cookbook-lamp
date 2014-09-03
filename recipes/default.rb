@@ -44,20 +44,12 @@ if node.local_database then
     cwd repo_directory
     not_if "if [ -z \"`mysql -u root -e \\\"show databases like '#{project}'\\\"`\" ]; then exit 1; fi"
   end 
-
-  directory "#{repo_directory}/tests/lib/" do
-    action :create
-    recursive true
-  end
 end
   
 if node.include_testing then
-  file "#{repo_directory}/tests/lib/.gitkeep" do
-    not_if do
-      File.exists?("#{repo_directory}/tests/lib/.gitkeep")
-    end
-  end
-  
+
+  include_recipe "tests"
+
   file "#{repo_directory}/tests/data.sql" do
     not_if do
       File.exists?("#{repo_directory}/tests/data.sql")
@@ -68,24 +60,7 @@ if node.include_testing then
     cwd "#{repo_directory}/tests"
   end
 
-  remote_file "#{repo_directory}/tests/lib/jasmine.js" do
-    source "https://s3.amazonaws.com/daftlabs-assets/jasmine/jasmine.js"
-    action :create
-  end
-
-  remote_file "#{repo_directory}/tests/lib/console.js" do
-    source "https://s3.amazonaws.com/daftlabs-assets/jasmine/console.js"
-    action :create
-  end 
-
   package "chrpath"
-
-  ark "phantomjs" do
-    action :install
-    has_binaries ['bin/phantomjs']
-    url "https://s3.amazonaws.com/daftlabs-assets/phantomjs-1.9.7-linux-x86_64.tar.bz2"
-    not_if "which phantomjs"
-  end
 end
 
 ark "liquibase" do
