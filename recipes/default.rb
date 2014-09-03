@@ -44,14 +44,10 @@ if node.local_database then
     cwd repo_directory
     not_if "if [ -z \"`mysql -u root -e \\\"show databases like '#{project}'\\\"`\" ]; then exit 1; fi"
   end 
-
-  directory "#{repo_directory}/tests/lib/" do
-    action :create
-    recursive true
-  end
 end
   
 if node.include_testing then
+
   include_recipe "tests"
 
   file "#{repo_directory}/tests/data.sql" do
