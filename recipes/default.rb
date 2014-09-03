@@ -52,7 +52,7 @@ if node.local_database then
 end
   
 if node.include_testing then
-  package "tests"
+  include_recipe "tests"
 
   file "#{repo_directory}/tests/data.sql" do
     not_if do
