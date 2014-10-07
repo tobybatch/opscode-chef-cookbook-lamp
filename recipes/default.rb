@@ -1,7 +1,6 @@
 include_recipe "apt"
 include_recipe "ark"
 include_recipe "curl"
-include_recipe "xhprof"
 include_recipe "java"
 
 include_recipe "php"
@@ -23,7 +22,7 @@ package "php5-mcrypt"   # for composer
 project = node[:project]
 repo_directory = "/var/www/#{project}"
 
-if node.local_database then
+if node.has_key?('local_database') and node.local_database then
   node.default["mysql"]["tunable"]["connect_timeout"] = "3600"
   node.default["mysql"]["tunable"]["net_read_timeout"] = "3600"
   node.default["mysql"]["tunable"]["wait_timeout"] = "3600"
@@ -46,7 +45,7 @@ if node.local_database then
   end 
 end
   
-if node.include_testing then
+if node.has_key?('include_testing') and node.include_testing then
 
   php_pear "xhprof" do
     zend_extensions ['xhprof.so']
@@ -106,17 +105,19 @@ file "#{repo_directory}/changes.sql" do
     File.exists?("#{repo_directory}/changes.sql")
   end
 end
-  
-liquibase_command = "java -jar #{repo_directory}/liquibase/liquibase.jar "\
-          "--changeLogFile=#{repo_directory}/changes.sql "\
-          "--url=jdbc:mysql://#{node.database.host}/#{node.database.name} "\
-          "--classpath=/usr/share/java/mysql-connector-java.jar "\
-          "--username=#{node.database.user} "\
-          "--password=#{node.database.pass} "\
-          "update"
 
-execute liquibase_command do
-  cwd "#{repo_directory}/liquibase"
+if node.has_key?('database') then
+  liquibase_command = "java -jar #{repo_directory}/liquibase/liquibase.jar "\
+            "--changeLogFile=#{repo_directory}/changes.sql "\
+            "--url=jdbc:mysql://#{node.database.host}/#{node.database.name} "\
+            "--classpath=/usr/share/java/mysql-connector-java.jar "\
+            "--username=#{node.database.user} "\
+            "--password=#{node.database.pass} "\
+            "update"
+
+  execute liquibase_command do
+    cwd "#{repo_directory}/liquibase"
+  end
 end
 
 template "/etc/apache2/sites-available/#{project}.conf" do
