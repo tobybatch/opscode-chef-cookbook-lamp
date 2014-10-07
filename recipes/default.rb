@@ -52,6 +52,31 @@ if node.local_database then
 end
   
 if node.include_testing then
+
+  php_pear "xhprof" do
+    zend_extensions ['xhprof.so']
+    preferred_state "beta"
+    action :install
+    directives(
+      "xhprof.output_dir" => "/tmp"
+    )
+    notifies :restart, resources(:service => "apache2")
+  end
+
+  php_pear "xdebug" do
+    zend_extensions ['xdebug.so']
+    action :install
+    directives(
+      :remote_enable => "on",
+      :remote_connect_back => "on",
+      :idekey => "vagrant",
+      :var_display_max_children => -1,
+      :var_display_max_data => -1,
+      :var_display_max_depth => -1
+    )
+    notifies :restart, resources(:service => "apache2")
+  end
+
   file "#{repo_directory}/tests/lib/.gitkeep" do
     not_if do
       File.exists?("#{repo_directory}/tests/lib/.gitkeep")
