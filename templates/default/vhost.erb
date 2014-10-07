@@ -1,3 +1,8 @@
 <VirtualHost *:80>
   DocumentRoot <%= @repo_directory %>
+  <Directory <%= @repo_directory %>>
+    Require all granted
+    Options FollowSymLinks
+    AllowOverride All
+  </Directory>
 </VirtualHost>
