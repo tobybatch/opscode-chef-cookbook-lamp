@@ -28,7 +28,6 @@ if node.has_key?('local_database') and node.local_database then
   node.default["mysql"]["tunable"]["net_read_timeout"] = "3600"
   node.default["mysql"]["tunable"]["wait_timeout"] = "3600"
   node.default['mysql']['tunable']['max_allowed_packet']   = "256M"
-  node.default['mysql']['tunable']['max_allowed_packet']   = "256M"
   node.default['mysql']['bind_address']   = "localhost"
   
   node.override["mysql"]["server_root_password"] = node.database.pass
