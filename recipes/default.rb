@@ -12,12 +12,13 @@ include_recipe "apache2"
 include_recipe "apache2::mod_php5"
 include_recipe "apache2::mod_rewrite"
 
-include_recipe "composer"
-
 package "sendmail"
 package "vim"
 package "libmysql-java" # for liquibase
 package "php5-mcrypt"   # for composer
+execute "php5enmod mcrypt"
+
+include_recipe "composer"
 
 project = node[:project]
 repo_directory = "/var/www/#{project}"
